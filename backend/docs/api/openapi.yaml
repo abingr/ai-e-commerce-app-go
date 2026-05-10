@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: AI E-Commerce API
   version: 0.1.0
-  description: Phase 1 API documentation for the mini electronics e-commerce backend.
+  description: API documentation for the mini electronics e-commerce backend.
 servers:
   - url: http://localhost:8080
 paths:
@@ -106,8 +106,151 @@ paths:
           description: Product not found.
         "500":
           description: Failed to get product.
+  /api/v1/auth/register:
+    post:
+      summary: Register a customer account.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered and JWT returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthEnvelope"
+        "400":
+          description: Invalid registration payload.
+        "409":
+          description: Email is already registered.
+        "500":
+          description: Failed to register user.
+  /api/v1/auth/login:
+    post:
+      summary: Login with email and password.
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Login successful and JWT returned.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthEnvelope"
+        "400":
+          description: Invalid login payload.
+        "401":
+          description: Invalid email or password.
+        "500":
+          description: Failed to login.
+  /api/v1/me:
+    get:
+      summary: Get the authenticated user profile.
+      tags:
+        - Auth
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current authenticated user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/User"
+        "401":
+          description: Missing, invalid, or expired token.
+        "500":
+          description: Failed to get current user.
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: Backend Learner
+        email:
+          type: string
+          format: email
+          example: learner@example.com
+        password:
+          type: string
+          format: password
+          minLength: 8
+          example: password123
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: learner@example.com
+        password:
+          type: string
+          format: password
+          example: password123
+    AuthEnvelope:
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            user:
+              $ref: "#/components/schemas/User"
+            token:
+              type: string
+              example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Backend Learner
+        email:
+          type: string
+          format: email
+          example: learner@example.com
+        role:
+          type: string
+          enum:
+            - customer
+            - admin
+          example: customer
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
     Product:
       type: object
       properties:

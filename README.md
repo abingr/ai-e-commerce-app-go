@@ -20,6 +20,14 @@ Phase 2 adds:
 - Product list and detail REST APIs
 - Basic React product catalog display
 
+Phase 3 adds:
+
+- User registration and login
+- Bcrypt password hashing
+- JWT token generation and validation
+- Protected `GET /api/v1/me` endpoint
+- Basic React authentication panel
+
 ## Project layout
 
 ```text
@@ -76,6 +84,12 @@ Follow the Phase 2 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-02-to-do-test.md
+```
+
+Follow the Phase 3 manual verification checklist:
+
+```text
+backend/docs/testing/phase-03-to-do-test.md
 ```
 
 Run backend tests:

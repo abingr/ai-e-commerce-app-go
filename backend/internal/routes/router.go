@@ -32,13 +32,19 @@ func New(deps Dependencies) *gin.Engine {
 	productRepository := repositories.NewProductRepository(deps.DB)
 	productService := services.NewProductService(productRepository)
 	productHandler := handlers.NewProductHandler(productService)
+	userRepository := repositories.NewUserRepository(deps.DB)
+	authService := services.NewAuthService(userRepository, deps.Config.JWTSecret, deps.Config.JWTIssuer)
+	authHandler := handlers.NewAuthHandler(authService)
 
 	router.GET("/health", healthHandler.Health)
 	router.GET("/ready", healthHandler.Ready)
 
 	api := router.Group("/api/v1")
+	api.POST("/auth/register", authHandler.Register)
+	api.POST("/auth/login", authHandler.Login)
 	api.GET("/products", productHandler.List)
 	api.GET("/products/:id", productHandler.GetByID)
+	api.GET("/me", requireAuth(authService), authHandler.Me)
 
 	return router
 }

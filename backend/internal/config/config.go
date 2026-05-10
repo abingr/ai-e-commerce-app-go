@@ -11,6 +11,8 @@ type Config struct {
 	AppName     string
 	HTTPPort    string
 	DatabaseURL string
+	JWTSecret   string
+	JWTIssuer   string
 }
 
 func Load() Config {
@@ -21,6 +23,8 @@ func Load() Config {
 		AppName:     getEnv("ECOMMERCE_APP_NAME", "ai-e-commerce-api"),
 		HTTPPort:    getEnv("ECOMMERCE_HTTP_PORT", "8080"),
 		DatabaseURL: getEnv("ECOMMERCE_DATABASE_URL", "postgres://ecommerce_user:ecommerce_password@127.0.0.1:55432/ecommerce_db?sslmode=disable"),
+		JWTSecret:   getEnv("ECOMMERCE_JWT_SECRET", "change-this-development-secret"),
+		JWTIssuer:   getEnv("ECOMMERCE_JWT_ISSUER", "ai-e-commerce-api"),
 	}
 }
 

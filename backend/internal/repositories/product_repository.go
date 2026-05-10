@@ -83,6 +83,61 @@ func (r ProductRepository) FindByID(ctx context.Context, id string) (models.Prod
 	return product, nil
 }
 
+func (r ProductRepository) Create(ctx context.Context, input models.ProductInput) (models.Product, error) {
+	row := r.db.QueryRow(ctx, `
+		INSERT INTO products (name, description, brand, category, price_cents, stock_quantity, image_url)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+		RETURNING id, name, description, brand, category, price_cents, stock_quantity, image_url, is_active, created_at, updated_at
+	`, input.Name, input.Description, input.Brand, input.Category, input.PriceCents, input.StockQuantity, input.ImageURL)
+
+	return scanProduct(row)
+}
+
+func (r ProductRepository) Update(ctx context.Context, id string, input models.ProductInput) (models.Product, error) {
+	row := r.db.QueryRow(ctx, `
+		UPDATE products
+		SET name = $2,
+			description = $3,
+			brand = $4,
+			category = $5,
+			price_cents = $6,
+			stock_quantity = $7,
+			image_url = $8,
+			updated_at = NOW()
+		WHERE id = $1 AND is_active = true
+		RETURNING id, name, description, brand, category, price_cents, stock_quantity, image_url, is_active, created_at, updated_at
+	`, id, input.Name, input.Description, input.Brand, input.Category, input.PriceCents, input.StockQuantity, input.ImageURL)
+
+	product, err := scanProduct(row)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return models.Product{}, ErrNotFound
+	}
+
+	if err != nil {
+		return models.Product{}, err
+	}
+
+	return product, nil
+}
+
+func (r ProductRepository) Delete(ctx context.Context, id string) error {
+	commandTag, err := r.db.Exec(ctx, `
+		UPDATE products
+		SET is_active = false,
+			updated_at = NOW()
+		WHERE id = $1 AND is_active = true
+	`, id)
+	if err != nil {
+		return err
+	}
+
+	if commandTag.RowsAffected() == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}
+
 type productScanner interface {
 	Scan(dest ...any) error
 }

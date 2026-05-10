@@ -49,4 +49,18 @@ func requireAuth(tokenParser TokenParser) gin.HandlerFunc {
 	}
 }
 
+func requireRole(role string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		userRole, exists := c.Get("user_role")
+		if !exists || userRole != role {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": "insufficient permissions",
+			})
+			return
+		}
+
+		c.Next()
+	}
+}
+
 type userIDContextKey struct{}

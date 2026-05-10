@@ -175,6 +175,103 @@ paths:
           description: Missing, invalid, or expired token.
         "500":
           description: Failed to get current user.
+  /api/v1/admin/products:
+    post:
+      summary: Create a product as an admin.
+      tags:
+        - Admin Products
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "201":
+          description: Product created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid product payload.
+        "401":
+          description: Missing or invalid token.
+        "403":
+          description: User is not an admin.
+        "500":
+          description: Failed to create product.
+  /api/v1/admin/products/{id}:
+    put:
+      summary: Update a product as an admin.
+      tags:
+        - Admin Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductInput"
+      responses:
+        "200":
+          description: Product updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid product ID or payload.
+        "401":
+          description: Missing or invalid token.
+        "403":
+          description: User is not an admin.
+        "404":
+          description: Product not found.
+        "500":
+          description: Failed to update product.
+    delete:
+      summary: Soft delete a product as an admin.
+      tags:
+        - Admin Products
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: Product soft deleted.
+        "400":
+          description: Invalid product ID.
+        "401":
+          description: Missing or invalid token.
+        "403":
+          description: User is not an admin.
+        "404":
+          description: Product not found.
+        "500":
+          description: Failed to delete product.
 components:
   securitySchemes:
     bearerAuth:
@@ -286,3 +383,35 @@ components:
         updated_at:
           type: string
           format: date-time
+    ProductInput:
+      type: object
+      required:
+        - name
+        - description
+        - brand
+        - category
+        - price_cents
+      properties:
+        name:
+          type: string
+          example: USB-C Docking Station
+        description:
+          type: string
+          example: Multi-port dock for laptops.
+        brand:
+          type: string
+          example: DockPro
+        category:
+          type: string
+          example: Accessories
+        price_cents:
+          type: integer
+          minimum: 0
+          example: 15900
+        stock_quantity:
+          type: integer
+          minimum: 0
+          example: 15
+        image_url:
+          type: string
+          example: https://example.com/dock.jpg

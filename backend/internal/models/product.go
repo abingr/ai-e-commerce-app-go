@@ -20,3 +20,13 @@ type ProductFilters struct {
 	Category string
 	Search   string
 }
+
+type ProductInput struct {
+	Name          string `json:"name" binding:"required"`
+	Description   string `json:"description" binding:"required"`
+	Brand         string `json:"brand" binding:"required"`
+	Category      string `json:"category" binding:"required"`
+	PriceCents    int    `json:"price_cents" binding:"required,min=0"`
+	StockQuantity int    `json:"stock_quantity" binding:"min=0"`
+	ImageURL      string `json:"image_url"`
+}

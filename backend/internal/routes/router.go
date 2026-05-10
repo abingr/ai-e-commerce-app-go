@@ -46,5 +46,10 @@ func New(deps Dependencies) *gin.Engine {
 	api.GET("/products/:id", productHandler.GetByID)
 	api.GET("/me", requireAuth(authService), authHandler.Me)
 
+	admin := api.Group("/admin", requireAuth(authService), requireRole("admin"))
+	admin.POST("/products", productHandler.Create)
+	admin.PUT("/products/:id", productHandler.Update)
+	admin.DELETE("/products/:id", productHandler.Delete)
+
 	return router
 }

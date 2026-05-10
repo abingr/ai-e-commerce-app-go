@@ -28,6 +28,13 @@ Phase 3 adds:
 - Protected `GET /api/v1/me` endpoint
 - Basic React authentication panel
 
+Phase 4 adds:
+
+- Role-based admin authorization
+- Admin product create/update/delete endpoints
+- Soft delete for product removal
+- Postman collection and environment for API testing
+
 ## Project layout
 
 ```text
@@ -90,6 +97,12 @@ Follow the Phase 3 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-03-to-do-test.md
+```
+
+Follow the Phase 4 manual verification checklist:
+
+```text
+backend/docs/testing/phase-04-to-do-test.md
 ```
 
 Run backend tests:

@@ -1,0 +1,145 @@
+openapi: 3.0.3
+info:
+  title: AI E-Commerce API
+  version: 0.1.0
+  description: Phase 1 API documentation for the mini electronics e-commerce backend.
+servers:
+  - url: http://localhost:8080
+paths:
+  /health:
+    get:
+      summary: Check whether the API server is alive.
+      tags:
+        - System
+      responses:
+        "200":
+          description: API is running.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  service:
+                    type: string
+                    example: ai-e-commerce-api
+  /ready:
+    get:
+      summary: Check whether the API is ready to serve traffic.
+      tags:
+        - System
+      responses:
+        "200":
+          description: API can reach required dependencies.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ready
+                  database:
+                    type: string
+                    example: connected
+        "503":
+          description: API cannot reach a required dependency.
+  /api/v1/products:
+    get:
+      summary: List active products.
+      tags:
+        - Products
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+          description: Optional exact category filter.
+          example: Accessories
+        - in: query
+          name: search
+          schema:
+            type: string
+          description: Optional case-insensitive search across name, description, and brand.
+          example: keyboard
+      responses:
+        "200":
+          description: Product list.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+        "500":
+          description: Failed to list products.
+  /api/v1/products/{id}:
+    get:
+      summary: Get one active product by ID.
+      tags:
+        - Products
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product detail.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Product"
+        "400":
+          description: Invalid product ID.
+        "404":
+          description: Product not found.
+        "500":
+          description: Failed to get product.
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: KeyForge Mechanical Keyboard
+        description:
+          type: string
+        brand:
+          type: string
+          example: KeyForge
+        category:
+          type: string
+          example: Accessories
+        price_cents:
+          type: integer
+          example: 12900
+        stock_quantity:
+          type: integer
+          example: 40
+        image_url:
+          type: string
+          example: https://images.unsplash.com/photo-1587829741301-dc798b83add3
+        is_active:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

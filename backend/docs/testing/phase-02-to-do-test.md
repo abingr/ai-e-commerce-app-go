@@ -7,7 +7,7 @@ Use this checklist after Phase 2 changes to verify the product catalog.
 From the project root:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace
+cd c:\Training\Golang\ai-e-commerce-app-go
 docker compose up -d postgres
 docker compose ps
 ```
@@ -28,7 +28,7 @@ Code/config involved:
 From the backend folder:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace\backend
+cd c:\Training\Golang\ai-e-commerce-app-go\backend
 go run ./cmd/migrate up
 ```
 
@@ -238,7 +238,7 @@ Expected result:
 From the frontend folder:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace\frontend
+cd c:\Training\Golang\ai-e-commerce-app-go\frontend
 npm install
 npm run dev -- --port 5173
 ```

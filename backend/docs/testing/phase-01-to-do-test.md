@@ -7,7 +7,7 @@ Use this file after Phase 1 changes to verify the foundation is working.
 From the project root:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace
+cd c:\Training\Golang\ai-e-commerce-app-go
 docker compose up -d postgres
 docker compose ps
 ```
@@ -28,7 +28,7 @@ Code/config involved:
 From the backend folder:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace\backend
+cd c:\Training\Golang\ai-e-commerce-app-go\backend
 go test ./...
 ```
 
@@ -58,7 +58,7 @@ Code path involved:
 From the backend folder:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace\backend
+cd c:\Training\Golang\ai-e-commerce-app-go\backend
 go run ./cmd/api
 ```
 
@@ -184,7 +184,7 @@ docker compose up -d postgres
 Open:
 
 ```text
-c:\Training\Golang\AI_Workspace\backend\docs\api\openapi.yaml
+c:\Training\Golang\ai-e-commerce-app-go\backend\docs\api\openapi.yaml
 ```
 
 Expected result:
@@ -202,7 +202,7 @@ Code/spec relationship:
 From the frontend folder:
 
 ```powershell
-cd c:\Training\Golang\AI_Workspace\frontend
+cd c:\Training\Golang\ai-e-commerce-app-go\frontend
 npm install
 npm run dev -- --port 5173
 ```

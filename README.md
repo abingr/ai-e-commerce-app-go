@@ -23,10 +23,9 @@ Phase 2 adds:
 ## Project layout
 
 ```text
-ai-e-commerce-app-go/
-  backend/       Go API
-  frontend/      Basic React client
-  docker-compose.yml
+backend/       Go API
+frontend/      Basic React client
+docker-compose.yml
 ```
 
 ## Run Phase 1

@@ -272,6 +272,140 @@ paths:
           description: Product not found.
         "500":
           description: Failed to delete product.
+  /api/v1/cart:
+    get:
+      summary: Get the authenticated user's cart.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Current cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        "401":
+          description: Missing or invalid token.
+        "500":
+          description: Failed to get cart.
+  /api/v1/cart/items:
+    post:
+      summary: Add an item to the authenticated user's cart.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AddCartItemRequest"
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        "400":
+          description: Invalid cart item payload.
+        "401":
+          description: Missing or invalid token.
+        "404":
+          description: Product not found.
+        "500":
+          description: Failed to add item to cart.
+    delete:
+      summary: Clear the authenticated user's cart.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      responses:
+        "204":
+          description: Cart cleared.
+        "401":
+          description: Missing or invalid token.
+        "500":
+          description: Failed to clear cart.
+  /api/v1/cart/items/{product_id}:
+    patch:
+      summary: Set the quantity for a cart item.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCartItemRequest"
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        "400":
+          description: Invalid product ID or payload.
+        "401":
+          description: Missing or invalid token.
+        "404":
+          description: Cart item not found.
+        "500":
+          description: Failed to update cart item.
+    delete:
+      summary: Remove a cart item.
+      tags:
+        - Cart
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: product_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        "400":
+          description: Invalid product ID.
+        "401":
+          description: Missing or invalid token.
+        "404":
+          description: Cart item not found.
+        "500":
+          description: Failed to remove cart item.
 components:
   securitySchemes:
     bearerAuth:
@@ -415,3 +549,62 @@ components:
         image_url:
           type: string
           example: https://example.com/dock.jpg
+    Cart:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItem"
+        total_cents:
+          type: integer
+          example: 31800
+    CartItem:
+      type: object
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: USB-C Docking Station
+        brand:
+          type: string
+          example: DockPro
+        category:
+          type: string
+          example: Accessories
+        image_url:
+          type: string
+          example: https://example.com/dock.jpg
+        quantity:
+          type: integer
+          example: 2
+        unit_price_cents:
+          type: integer
+          example: 15900
+        line_total_cents:
+          type: integer
+          example: 31800
+    AddCartItemRequest:
+      type: object
+      required:
+        - product_id
+        - quantity
+      properties:
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+          example: 2
+    UpdateCartItemRequest:
+      type: object
+      required:
+        - quantity
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+          example: 3

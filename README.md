@@ -35,6 +35,13 @@ Phase 4 adds:
 - Soft delete for product removal
 - Postman collection and environment for API testing
 
+Phase 5 adds:
+
+- Authenticated shopping cart APIs
+- Cart item table with foreign keys and unique constraints
+- Add/update/remove/clear cart operations
+- User-scoped cart access using JWT identity
+
 ## Project layout
 
 ```text
@@ -103,6 +110,12 @@ Follow the Phase 4 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-04-to-do-test.md
+```
+
+Follow the Phase 5 manual verification checklist:
+
+```text
+backend/docs/testing/phase-05-to-do-test.md
 ```
 
 Run backend tests:

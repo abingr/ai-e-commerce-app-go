@@ -70,18 +70,112 @@ Environment variables used:
 - `admin_token`
 - `product_id`
 
+Before continuing, confirm these environment values:
+
+```text
+base_url       = http://localhost:8080
+customer_email = customer01@gmail.com
+admin_email    = admin01@gmail.com
+password       = 12345678
+```
+
+Important Postman variable note:
+
+- Use `{{customer_email}}` only when `customer_email` exists as a Postman environment variable.
+- Do not write `{{customer01@gmail.com}}`.
+- Do not write `{{12345678}}`.
+
+Correct variable-based JSON:
+
+```json
+{
+  "name": "customer01",
+  "email": "{{customer_email}}",
+  "password": "{{password}}"
+}
+```
+
+Correct literal JSON:
+
+```json
+{
+  "name": "customer01",
+  "email": "customer01@gmail.com",
+  "password": "12345678"
+}
+```
+
+Before testing auth, run:
+
+```text
+System -> Health
+```
+
+Request details:
+
+```text
+Method: GET
+URL:    {{base_url}}/health
+```
+
+Expected result:
+
+- Status `200 OK`.
+- Response contains `status: ok`.
+
+If this returns `404`, check that the URL is using backend port `8080`, not frontend port `5173`.
+
 ## 4. Register Customer In Postman
 
-Run:
+Run this request:
 
 ```text
 Auth -> Register Customer
+```
+
+Request details:
+
+```text
+Method: POST
+URL:    {{base_url}}/api/v1/auth/register
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+```
+
+Body tab:
+
+```text
+raw -> JSON
+```
+
+Body:
+
+```json
+{
+  "name": "Customer User",
+  "email": "{{customer_email}}",
+  "password": "{{password}}"
+}
 ```
 
 Expected result:
 
 - Status `201 Created`, or `409 Conflict` if the user already exists.
 - If status is `201`, Postman stores `customer_token` automatically.
+- Response includes `data.user.role = customer`.
+- Response includes `data.token`.
+- Response must not include `password_hash`.
+
+If you get `404 page not found`:
+
+- Confirm method is `POST`.
+- Confirm URL is `{{base_url}}/api/v1/auth/register`.
+- Confirm `base_url` is `http://localhost:8080`.
+- Confirm the backend API is running.
 
 Then run:
 
@@ -89,10 +183,58 @@ Then run:
 Auth -> Login Customer
 ```
 
+Request details:
+
+```text
+Method: POST
+URL:    {{base_url}}/api/v1/auth/login
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+```
+
+Body:
+
+```json
+{
+  "email": "{{customer_email}}",
+  "password": "{{password}}"
+}
+```
+
 Expected result:
 
 - Status `200 OK`.
 - Postman stores `customer_token`.
+- Response includes `data.user.email`.
+- Response includes `data.token`.
+
+Then run:
+
+```text
+Auth -> Get Me
+```
+
+Request details:
+
+```text
+Method: GET
+URL:    {{base_url}}/api/v1/me
+```
+
+Headers:
+
+```text
+Authorization: Bearer {{customer_token}}
+```
+
+Expected result:
+
+- Status `200 OK`.
+- Response user email matches `customer_email`.
 
 ## 5. Verify Customer Cannot Create Product
 
@@ -100,6 +242,34 @@ Run:
 
 ```text
 Admin Products -> Customer Cannot Create Product
+```
+
+Request details:
+
+```text
+Method: POST
+URL:    {{base_url}}/api/v1/admin/products
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+Authorization: Bearer {{customer_token}}
+```
+
+Body:
+
+```json
+{
+  "name": "USB-C Docking Station",
+  "description": "Multi-port dock for laptops.",
+  "brand": "DockPro",
+  "category": "Accessories",
+  "price_cents": 15900,
+  "stock_quantity": 15,
+  "image_url": "https://example.com/dock.jpg"
+}
 ```
 
 Expected result:
@@ -117,13 +287,13 @@ Code path involved:
 
 Register an admin user as a normal customer first:
 
-In Postman, set `admin_email` to:
+In the selected Postman environment, set `admin_email` to:
 
 ```text
-admin@example.com
+admin01@gmail.com
 ```
 
-Temporarily change the body of:
+Option A: temporarily change the body of:
 
 ```text
 Auth -> Register Customer
@@ -139,10 +309,14 @@ to use:
 }
 ```
 
-Run the request. Then promote that user in PostgreSQL:
+Run the request.
+
+Option B: duplicate `Auth -> Register Customer`, rename it `Register Admin`, and use the admin body above.
+
+Then promote that user in PostgreSQL:
 
 ```powershell
-docker exec ai_ecommerce_postgres psql -U ecommerce_user -d ecommerce_db -c "UPDATE users SET role = 'admin' WHERE email = 'admin@example.com';"
+docker exec ai_ecommerce_postgres psql -U ecommerce_user -d ecommerce_db -c "UPDATE users SET role = 'admin' WHERE email = 'admin01@gmail.com';"
 ```
 
 Expected result:
@@ -157,10 +331,35 @@ Then run:
 Auth -> Login Admin
 ```
 
+Request details:
+
+```text
+Method: POST
+URL:    {{base_url}}/api/v1/auth/login
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+```
+
+Body:
+
+```json
+{
+  "email": "{{admin_email}}",
+  "password": "{{password}}"
+}
+```
+
 Expected result:
 
 - Status `200 OK`.
 - Postman stores `admin_token`.
+- Response includes `data.user.role = admin`.
+
+If response still says `customer`, run the SQL promotion command again and then login again.
 
 ## 7. Create Product As Admin
 
@@ -168,6 +367,34 @@ Run:
 
 ```text
 Admin Products -> Create Product
+```
+
+Request details:
+
+```text
+Method: POST
+URL:    {{base_url}}/api/v1/admin/products
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+```
+
+Body:
+
+```json
+{
+  "name": "USB-C Docking Station",
+  "description": "Multi-port dock for laptops.",
+  "brand": "DockPro",
+  "category": "Accessories",
+  "price_cents": 15900,
+  "stock_quantity": 15,
+  "image_url": "https://example.com/dock.jpg"
+}
 ```
 
 Expected result:
@@ -190,6 +417,34 @@ Run:
 Admin Products -> Update Product
 ```
 
+Request details:
+
+```text
+Method: PUT
+URL:    {{base_url}}/api/v1/admin/products/{{product_id}}
+```
+
+Headers:
+
+```text
+Content-Type: application/json
+Authorization: Bearer {{admin_token}}
+```
+
+Body:
+
+```json
+{
+  "name": "USB-C Docking Station Pro",
+  "description": "Updated multi-port dock for laptops.",
+  "brand": "DockPro",
+  "category": "Accessories",
+  "price_cents": 17900,
+  "stock_quantity": 20,
+  "image_url": "https://example.com/dock-pro.jpg"
+}
+```
+
 Expected result:
 
 - Status `200 OK`.
@@ -207,6 +462,19 @@ Run:
 
 ```text
 Admin Products -> Delete Product
+```
+
+Request details:
+
+```text
+Method: DELETE
+URL:    {{base_url}}/api/v1/admin/products/{{product_id}}
+```
+
+Headers:
+
+```text
+Authorization: Bearer {{admin_token}}
 ```
 
 Expected result:
@@ -227,6 +495,13 @@ Run:
 Products -> Get Product Detail
 ```
 
+Request details:
+
+```text
+Method: GET
+URL:    {{base_url}}/api/v1/products/{{product_id}}
+```
+
 Expected result:
 
 - Status `404 Not Found`.
@@ -235,6 +510,13 @@ Run:
 
 ```text
 Products -> List Products
+```
+
+Request details:
+
+```text
+Method: GET
+URL:    {{base_url}}/api/v1/products
 ```
 
 Expected result:

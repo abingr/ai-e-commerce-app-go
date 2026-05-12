@@ -38,6 +38,9 @@ func New(deps Dependencies) *gin.Engine {
 	cartRepository := repositories.NewCartRepository(deps.DB)
 	cartService := services.NewCartService(cartRepository)
 	cartHandler := handlers.NewCartHandler(cartService)
+	orderRepository := repositories.NewOrderRepository(deps.DB)
+	orderService := services.NewOrderService(orderRepository)
+	orderHandler := handlers.NewOrderHandler(orderService)
 
 	router.GET("/health", healthHandler.Health)
 	router.GET("/ready", healthHandler.Ready)
@@ -55,6 +58,11 @@ func New(deps Dependencies) *gin.Engine {
 	cart.PATCH("/items/:product_id", cartHandler.UpdateItem)
 	cart.DELETE("/items/:product_id", cartHandler.RemoveItem)
 	cart.DELETE("/items", cartHandler.Clear)
+
+	orders := api.Group("/orders", requireAuth(authService))
+	orders.POST("", orderHandler.CreateFromCart)
+	orders.GET("", orderHandler.List)
+	orders.GET("/:id", orderHandler.GetByID)
 
 	admin := api.Group("/admin", requireAuth(authService), requireRole("admin"))
 	admin.POST("/products", productHandler.Create)

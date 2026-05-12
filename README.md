@@ -42,6 +42,14 @@ Phase 5 adds:
 - Add/update/remove/clear cart operations
 - User-scoped cart access using JWT identity
 
+Phase 6 adds:
+
+- Checkout without payment
+- Order and order item database tables
+- Transaction-backed order creation from the cart
+- Order history APIs for authenticated users
+- Product name and price snapshots on order items
+
 ## Project layout
 
 ```text
@@ -116,6 +124,12 @@ Follow the Phase 5 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-05-to-do-test.md
+```
+
+Follow the Phase 6 manual verification checklist:
+
+```text
+backend/docs/testing/phase-06-to-do-test.md
 ```
 
 Run backend tests:

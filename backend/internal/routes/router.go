@@ -25,6 +25,7 @@ func New(deps Dependencies) *gin.Engine {
 
 	router := gin.New()
 	router.Use(gin.Recovery())
+	router.Use(requestID())
 	router.Use(cors())
 	router.Use(requestLogger(deps.Logger))
 

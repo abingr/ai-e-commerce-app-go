@@ -36,9 +36,8 @@ func (h ProductHandler) List(c *gin.Context) {
 
 	products, err := h.service.ListProducts(c.Request.Context(), filters)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to list products",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to list products")
 		return
 	}
 
@@ -50,24 +49,19 @@ func (h ProductHandler) List(c *gin.Context) {
 func (h ProductHandler) GetByID(c *gin.Context) {
 	id := c.Param("id")
 	if _, err := uuid.Parse(id); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid product id",
-		})
+		JSONError(c, http.StatusBadRequest, "BAD_REQUEST", "invalid product id")
 		return
 	}
 
 	product, err := h.service.GetProduct(c.Request.Context(), id)
 	if errors.Is(err, repositories.ErrNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "product not found",
-		})
+		JSONError(c, http.StatusNotFound, "NOT_FOUND", "product not found")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to get product",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to get product")
 		return
 	}
 
@@ -79,17 +73,14 @@ func (h ProductHandler) GetByID(c *gin.Context) {
 func (h ProductHandler) Create(c *gin.Context) {
 	var input models.ProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid product payload",
-		})
+		JSONValidationError(c, "invalid product payload", err)
 		return
 	}
 
 	product, err := h.service.CreateProduct(c.Request.Context(), input)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to create product",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to create product")
 		return
 	}
 
@@ -101,32 +92,25 @@ func (h ProductHandler) Create(c *gin.Context) {
 func (h ProductHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 	if _, err := uuid.Parse(id); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid product id",
-		})
+		JSONError(c, http.StatusBadRequest, "BAD_REQUEST", "invalid product id")
 		return
 	}
 
 	var input models.ProductInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid product payload",
-		})
+		JSONValidationError(c, "invalid product payload", err)
 		return
 	}
 
 	product, err := h.service.UpdateProduct(c.Request.Context(), id, input)
 	if errors.Is(err, repositories.ErrNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "product not found",
-		})
+		JSONError(c, http.StatusNotFound, "NOT_FOUND", "product not found")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to update product",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to update product")
 		return
 	}
 
@@ -138,24 +122,19 @@ func (h ProductHandler) Update(c *gin.Context) {
 func (h ProductHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 	if _, err := uuid.Parse(id); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid product id",
-		})
+		JSONError(c, http.StatusBadRequest, "BAD_REQUEST", "invalid product id")
 		return
 	}
 
 	err := h.service.DeleteProduct(c.Request.Context(), id)
 	if errors.Is(err, repositories.ErrNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "product not found",
-		})
+		JSONError(c, http.StatusNotFound, "NOT_FOUND", "product not found")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to delete product",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to delete product")
 		return
 	}
 

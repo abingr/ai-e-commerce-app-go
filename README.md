@@ -50,6 +50,13 @@ Phase 6 adds:
 - Order history APIs for authenticated users
 - Product name and price snapshots on order items
 
+Phase 7 adds:
+
+- Consistent API error responses
+- Field-level validation error details
+- Request IDs with `X-Request-ID`
+- Structured request logging with internal error capture
+
 ## Project layout
 
 ```text
@@ -130,6 +137,12 @@ Follow the Phase 6 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-06-to-do-test.md
+```
+
+Follow the Phase 7 manual verification checklist:
+
+```text
+backend/docs/testing/phase-07-to-do-test.md
 ```
 
 Run backend tests:

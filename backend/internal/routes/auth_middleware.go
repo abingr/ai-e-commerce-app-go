@@ -2,9 +2,9 @@ package routes
 
 import (
 	"context"
-	"net/http"
 	"strings"
 
+	"ai-e-commerce-app-go/backend/internal/handlers"
 	"ai-e-commerce-app-go/backend/internal/services"
 
 	"github.com/gin-gonic/gin"
@@ -18,25 +18,22 @@ func requireAuth(tokenParser TokenParser) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
 		if header == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "authorization header required",
-			})
+			handlers.JSONError(c, 401, "UNAUTHORIZED", "authorization header required")
+			c.Abort()
 			return
 		}
 
 		tokenString, ok := strings.CutPrefix(header, "Bearer ")
 		if !ok || strings.TrimSpace(tokenString) == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "bearer token required",
-			})
+			handlers.JSONError(c, 401, "UNAUTHORIZED", "bearer token required")
+			c.Abort()
 			return
 		}
 
 		claims, err := tokenParser.ParseToken(tokenString)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "invalid or expired token",
-			})
+			handlers.JSONError(c, 401, "UNAUTHORIZED", "invalid or expired token")
+			c.Abort()
 			return
 		}
 
@@ -53,9 +50,8 @@ func requireRole(role string) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		userRole, exists := c.Get("user_role")
 		if !exists || userRole != role {
-			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
-				"error": "insufficient permissions",
-			})
+			handlers.JSONError(c, 403, "FORBIDDEN", "insufficient permissions")
+			c.Abort()
 			return
 		}
 

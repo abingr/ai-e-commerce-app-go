@@ -29,24 +29,19 @@ func NewAuthHandler(service AuthService) AuthHandler {
 func (h AuthHandler) Register(c *gin.Context) {
 	var input models.RegisterUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid registration payload",
-		})
+		JSONValidationError(c, "invalid registration payload", err)
 		return
 	}
 
 	response, err := h.service.Register(c.Request.Context(), input)
 	if errors.Is(err, repositories.ErrConflict) {
-		c.JSON(http.StatusConflict, gin.H{
-			"error": "email already registered",
-		})
+		JSONError(c, http.StatusConflict, "CONFLICT", "email already registered")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to register user",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to register user")
 		return
 	}
 
@@ -58,24 +53,19 @@ func (h AuthHandler) Register(c *gin.Context) {
 func (h AuthHandler) Login(c *gin.Context) {
 	var input models.LoginUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid login payload",
-		})
+		JSONValidationError(c, "invalid login payload", err)
 		return
 	}
 
 	response, err := h.service.Login(c.Request.Context(), input)
 	if errors.Is(err, services.ErrInvalidCredentials) {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "invalid email or password",
-		})
+		JSONError(c, http.StatusUnauthorized, "UNAUTHORIZED", "invalid email or password")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to login",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to login")
 		return
 	}
 
@@ -87,24 +77,19 @@ func (h AuthHandler) Login(c *gin.Context) {
 func (h AuthHandler) Me(c *gin.Context) {
 	userID, exists := c.Get("user_id")
 	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "authentication required",
-		})
+		JSONError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
 		return
 	}
 
 	user, err := h.service.GetUser(c.Request.Context(), userID.(string))
 	if errors.Is(err, repositories.ErrNotFound) {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"error": "authentication required",
-		})
+		JSONError(c, http.StatusUnauthorized, "UNAUTHORIZED", "authentication required")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to get current user",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to get current user")
 		return
 	}
 

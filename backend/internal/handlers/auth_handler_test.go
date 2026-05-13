@@ -104,6 +104,57 @@ func TestAuthRegisterReturnsConflict(t *testing.T) {
 	}
 }
 
+func TestAuthRegisterValidationReturnsFieldDetails(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	service := stubAuthService{
+		register: func(ctx context.Context, input models.RegisterUserInput) (models.AuthResponse, error) {
+			t.Fatal("service should not be called for invalid payload")
+			return models.AuthResponse{}, nil
+		},
+	}
+
+	router := gin.New()
+	handler := handlers.NewAuthHandler(service)
+	router.POST("/api/v1/auth/register", func(c *gin.Context) {
+		c.Set("request_id", "test-request-id")
+		handler.Register(c)
+	})
+
+	body := bytes.NewBufferString(`{"name":"","email":"not-an-email","password":"short"}`)
+	request := httptest.NewRequest(http.MethodPost, "/api/v1/auth/register", body)
+	request.Header.Set("Content-Type", "application/json")
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusBadRequest {
+		t.Fatalf("expected status %d, got %d", http.StatusBadRequest, response.Code)
+	}
+
+	var payload struct {
+		Error     string                `json:"error"`
+		Code      string                `json:"code"`
+		RequestID string                `json:"request_id"`
+		Fields    []handlers.FieldError `json:"fields"`
+	}
+	if err := json.Unmarshal(response.Body.Bytes(), &payload); err != nil {
+		t.Fatalf("expected valid JSON response: %v", err)
+	}
+
+	if payload.Code != "VALIDATION_ERROR" {
+		t.Fatalf("expected validation code, got %q", payload.Code)
+	}
+
+	if payload.RequestID != "test-request-id" {
+		t.Fatalf("expected request id in response, got %q", payload.RequestID)
+	}
+
+	if len(payload.Fields) == 0 {
+		t.Fatal("expected validation field details")
+	}
+}
+
 func TestAuthLoginReturnsUnauthorized(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 

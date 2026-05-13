@@ -534,6 +534,41 @@ components:
             token:
               type: string
               example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: product not found
+        code:
+          type: string
+          example: NOT_FOUND
+        request_id:
+          type: string
+          example: 8f1f1e8e-9b89-4df3-bcc4-c550890b55cb
+    ValidationErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: invalid registration payload
+        code:
+          type: string
+          example: VALIDATION_ERROR
+        request_id:
+          type: string
+          example: 8f1f1e8e-9b89-4df3-bcc4-c550890b55cb
+        fields:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: email
+              rule:
+                type: string
+                example: email
     User:
       type: object
       properties:

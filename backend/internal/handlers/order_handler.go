@@ -34,16 +34,13 @@ func (h OrderHandler) CreateFromCart(c *gin.Context) {
 
 	order, err := h.service.CreateFromCart(c.Request.Context(), userID)
 	if errors.Is(err, repositories.ErrEmptyCart) {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "cart is empty",
-		})
+		JSONError(c, http.StatusBadRequest, "BAD_REQUEST", "cart is empty")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to create order",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to create order")
 		return
 	}
 
@@ -60,9 +57,8 @@ func (h OrderHandler) List(c *gin.Context) {
 
 	orders, err := h.service.ListByUser(c.Request.Context(), userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to list orders",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to list orders")
 		return
 	}
 
@@ -79,24 +75,19 @@ func (h OrderHandler) GetByID(c *gin.Context) {
 
 	orderID := c.Param("id")
 	if _, err := uuid.Parse(orderID); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "invalid order id",
-		})
+		JSONError(c, http.StatusBadRequest, "BAD_REQUEST", "invalid order id")
 		return
 	}
 
 	order, err := h.service.FindByIDForUser(c.Request.Context(), userID, orderID)
 	if errors.Is(err, repositories.ErrNotFound) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "order not found",
-		})
+		JSONError(c, http.StatusNotFound, "NOT_FOUND", "order not found")
 		return
 	}
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to get order",
-		})
+		RecordError(c, err)
+		JSONError(c, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to get order")
 		return
 	}
 

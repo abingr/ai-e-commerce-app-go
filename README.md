@@ -57,6 +57,14 @@ Phase 7 adds:
 - Request IDs with `X-Request-ID`
 - Structured request logging with internal error capture
 
+Phase 8 adds:
+
+- React integration with backend APIs
+- Product search and category filtering
+- Browser login/register flow with JWT storage
+- Cart management from the frontend
+- Checkout and order history from the frontend
+
 ## Project layout
 
 ```text
@@ -143,6 +151,12 @@ Follow the Phase 7 manual verification checklist:
 
 ```text
 backend/docs/testing/phase-07-to-do-test.md
+```
+
+Follow the Phase 8 manual verification checklist:
+
+```text
+backend/docs/testing/phase-08-to-do-test.md
 ```
 
 Run backend tests:

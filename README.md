@@ -1,6 +1,18 @@
 # ai-e-commerce-app-go
 
-A production-style learning project for a mini electronics e-commerce application.
+A production-style learning project for a mini electronics e-commerce application built with Go, Gin, PostgreSQL, JWT authentication, React, OpenAPI, Postman, Docker, and GitHub Actions.
+
+## Highlights
+
+- Layered backend architecture: handlers, services, repositories, models
+- PostgreSQL migrations and seed data
+- Product catalog, admin product management, cart, checkout, and order history
+- JWT authentication, bcrypt password hashing, and role-based authorization
+- User-scoped resources and transaction-backed checkout
+- Consistent validation errors, request IDs, and structured logs
+- React frontend connected to the backend API
+- OpenAPI documentation and Postman collection
+- Automated tests, Dockerfiles, and CI workflow
 
 Phase 1 creates the foundation:
 
@@ -65,15 +77,30 @@ Phase 8 adds:
 - Cart management from the frontend
 - Checkout and order history from the frontend
 
+Phase 9 adds:
+
+- Broader service and middleware tests
+- Documented testing strategy
+- Opt-in database integration test guidance
+
+Phase 10 adds:
+
+- Backend and frontend Dockerfiles
+- GitHub Actions CI
+- Final README polish
+- CV summary document
+
 ## Project layout
 
 ```text
 backend/       Go API
 frontend/      Basic React client
+docs/          CV/project summary notes
 docker-compose.yml
+.github/       GitHub Actions workflow
 ```
 
-## Run Phase 1
+## Run Locally
 
 Start PostgreSQL:
 
@@ -109,6 +136,13 @@ Read the Phase 1 OpenAPI document:
 
 ```text
 backend/docs/api/openapi.yaml
+```
+
+Import Postman files:
+
+```text
+postman/ai-e-commerce-app-go.postman_collection.json
+postman/ai-e-commerce-local.postman_environment.json
 ```
 
 Follow the Phase 1 manual verification checklist:
@@ -159,6 +193,18 @@ Follow the Phase 8 manual verification checklist:
 backend/docs/testing/phase-08-to-do-test.md
 ```
 
+Follow the Phase 9 manual verification checklist:
+
+```text
+backend/docs/testing/phase-09-to-do-test.md
+```
+
+Follow the Phase 10 manual verification checklist:
+
+```text
+backend/docs/testing/phase-10-to-do-test.md
+```
+
 Run backend tests:
 
 ```powershell
@@ -172,6 +218,31 @@ Run the frontend:
 cd frontend
 npm install
 npm run dev
+```
+
+Build Docker images:
+
+```powershell
+docker build -t ai-ecommerce-backend ./backend
+docker build -t ai-ecommerce-frontend ./frontend
+```
+
+## CI
+
+GitHub Actions workflow:
+
+```text
+.github/workflows/ci.yml
+```
+
+It runs backend formatting/tests and frontend install/build/audit checks.
+
+## CV Notes
+
+Use this summary when preparing your resume or interview notes:
+
+```text
+docs/cv-summary.md
 ```
 
 ## Phase roadmap

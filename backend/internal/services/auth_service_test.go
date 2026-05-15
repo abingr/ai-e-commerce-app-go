@@ -120,3 +120,23 @@ func TestAuthServiceLoginRejectsUnknownEmail(t *testing.T) {
 		t.Fatalf("expected invalid credentials, got %v", err)
 	}
 }
+
+func TestAuthServiceParseTokenRejectsWrongIssuer(t *testing.T) {
+	repository := stubUserRepository{}
+	service := services.NewAuthService(repository, "test-secret", "expected-issuer")
+	otherIssuerService := services.NewAuthService(repository, "test-secret", "other-issuer")
+
+	token, err := otherIssuerService.GenerateToken(models.User{
+		ID:    "f5e5a9b0-4055-421f-bd6f-7e755a16d1af",
+		Email: "learner@example.com",
+		Role:  models.RoleCustomer,
+	})
+	if err != nil {
+		t.Fatalf("generate token: %v", err)
+	}
+
+	_, err = service.ParseToken(token)
+	if err == nil {
+		t.Fatal("expected wrong issuer token to be rejected")
+	}
+}

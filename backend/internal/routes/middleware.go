@@ -3,6 +3,7 @@ package routes
 import (
 	"log/slog"
 	"net/http"
+	"slices"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -22,11 +23,17 @@ func requestID() gin.HandlerFunc {
 	}
 }
 
-func cors() gin.HandlerFunc {
+func cors(allowedOrigins []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		c.Header("Access-Control-Allow-Origin", "http://localhost:5173")
+		origin := c.GetHeader("Origin")
+		if origin != "" && slices.Contains(allowedOrigins, origin) {
+			c.Header("Access-Control-Allow-Origin", origin)
+		}
+
+		c.Header("Vary", "Origin")
 		c.Header("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
 		c.Header("Access-Control-Allow-Headers", "Authorization,Content-Type")
+		c.Header("Access-Control-Max-Age", "3600")
 
 		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)

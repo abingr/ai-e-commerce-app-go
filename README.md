@@ -90,6 +90,14 @@ Phase 10 adds:
 - Final README polish
 - CV summary document
 
+Phase 11 adds:
+
+- Deployment-ready backend CORS configuration
+- Vite environment variable for the frontend API URL
+- Render deployment blueprint
+- Vercel frontend configuration
+- Neon/Postgres deployment learning docs
+
 ## Project layout
 
 ```text
@@ -205,6 +213,12 @@ Follow the Phase 10 manual verification checklist:
 backend/docs/testing/phase-10-to-do-test.md
 ```
 
+Follow the Phase 11 manual verification checklist:
+
+```text
+backend/docs/testing/phase-11-to-do-test.md
+```
+
 Run backend tests:
 
 ```powershell
@@ -243,6 +257,12 @@ Use this summary when preparing your resume or interview notes:
 
 ```text
 docs/cv-summary.md
+```
+
+Free-hosting deployment guide:
+
+```text
+docs/deployment-free-hosting.md
 ```
 
 ## Phase roadmap

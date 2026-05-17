@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: ai-ecommerce-api
+    runtime: docker
+    plan: free
+    rootDir: backend
+    healthCheckPath: /ready
+    envVars:
+      - key: ECOMMERCE_APP_ENV
+        value: production
+      - key: ECOMMERCE_APP_NAME
+        value: ai-e-commerce-api
+      - key: ECOMMERCE_HTTP_PORT
+        value: 8080
+      - key: ECOMMERCE_DATABASE_URL
+        sync: false
+      - key: ECOMMERCE_JWT_SECRET
+        generateValue: true
+      - key: ECOMMERCE_JWT_ISSUER
+        value: ai-e-commerce-api
+      - key: ECOMMERCE_CORS_ALLOWED_ORIGINS
+        sync: false

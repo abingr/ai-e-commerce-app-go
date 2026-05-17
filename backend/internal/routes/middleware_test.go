@@ -57,12 +57,13 @@ func TestCorsHandlesPreflight(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 
 	router := gin.New()
-	router.Use(cors())
+	router.Use(cors([]string{"http://localhost:5173"}))
 	router.OPTIONS("/api/v1/products", func(c *gin.Context) {
 		t.Fatal("preflight should abort before route handler")
 	})
 
 	request := httptest.NewRequest(http.MethodOptions, "/api/v1/products", nil)
+	request.Header.Set("Origin", "http://localhost:5173")
 	response := httptest.NewRecorder()
 
 	router.ServeHTTP(response, request)
@@ -73,5 +74,25 @@ func TestCorsHandlesPreflight(t *testing.T) {
 
 	if response.Header().Get("Access-Control-Allow-Origin") != "http://localhost:5173" {
 		t.Fatalf("expected CORS origin header, got %q", response.Header().Get("Access-Control-Allow-Origin"))
+	}
+}
+
+func TestCorsRejectsUnknownOriginHeader(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+
+	router := gin.New()
+	router.Use(cors([]string{"https://frontend.example.com"}))
+	router.GET("/api/v1/products", func(c *gin.Context) {
+		c.Status(http.StatusNoContent)
+	})
+
+	request := httptest.NewRequest(http.MethodGet, "/api/v1/products", nil)
+	request.Header.Set("Origin", "https://unknown.example.com")
+	response := httptest.NewRecorder()
+
+	router.ServeHTTP(response, request)
+
+	if response.Header().Get("Access-Control-Allow-Origin") != "" {
+		t.Fatalf("expected unknown origin to be omitted, got %q", response.Header().Get("Access-Control-Allow-Origin"))
 	}
 }
